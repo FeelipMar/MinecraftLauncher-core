@@ -15,7 +15,7 @@ class MCLCore extends EventEmitter {
         url: {
           meta: 'https://launchermeta.mojang.com',
           resource: 'https://resources.download.minecraft.net',
-          mavenForge: 'http://files.minecraftforge.net/maven/',
+          mavenForge: 'https://files.minecraftforge.net/maven/',
           defaultRepoForge: 'https://libraries.minecraft.net/',
           fallbackMaven: 'https://search.maven.org/remotecontent?filepath=',
           ...this.options.overrides
@@ -24,9 +24,9 @@ class MCLCore extends EventEmitter {
         },
         fw: {
           baseUrl: 'https://github.com/ZekerZhayard/ForgeWrapper/releases/download/',
-          version: '1.5.6',
-          sh1: 'b38d28e8b7fde13b1bc0db946a2da6760fecf98d',
-          size: 34715,
+          version: '1.6.0',
+          sh1: '035a51fe6439792a61507630d89382f621da0f1f',
+          size: 28679,
           ...this.options.overrides
             ? this.options.overrides.fw
             : undefined
@@ -48,19 +48,6 @@ class MCLCore extends EventEmitter {
       this.createGameDirectory()
 
       await this.extractPackage()
-
-      if (this.options.installer) {
-        // So installers that create a profile in launcher_profiles.json can run without breaking.
-        const profilePath = path.join(this.options.root, 'launcher_profiles.json')
-        if (!fs.existsSync(profilePath) || !JSON.parse(fs.readFileSync(profilePath)).profiles) {
-          fs.writeFileSync(profilePath, JSON.stringify({ profiles: {} }, null, 4))
-        }
-        const code = await this.handler.runInstaller(this.options.installer)
-        if (!this.options.version.custom && code === 0) {
-          this.emit('debug', '[MCLC]: Installer successfully ran, but no custom version was provided')
-        }
-        this.emit('debug', `[MCLC]: Installer closed with code ${code}`)
-      }
 
       const directory = this.options.overrides.directory || path.join(this.options.root, 'versions', this.options.version.custom ? this.options.version.custom : this.options.version.number)
       this.options.directory = directory
